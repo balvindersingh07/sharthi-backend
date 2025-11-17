@@ -23,16 +23,15 @@ const userSchema = new mongoose.Schema(
       minlength: 6,
     },
 
-    // 🚀 Updated to match frontend exactly
+    // ✅ Correct roles (frontend-consistent + admin added)
     role: {
       type: String,
-      enum: ["CREATOR", "ORGANIZER"],
-      default: "CREATOR",
+      enum: ["creator", "organizer", "admin"],
+      default: "creator",
     }
   },
   { timestamps: true }
 );
-
 
 // 🔐 Encrypt password
 userSchema.pre("save", async function (next) {
@@ -44,8 +43,7 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-
-// 🔍 Password Check
+// 🔍 Compare Password
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
