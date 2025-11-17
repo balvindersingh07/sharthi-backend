@@ -23,16 +23,18 @@ const userSchema = new mongoose.Schema(
       minlength: 6,
     },
 
+    // 🚀 Updated to match frontend exactly
     role: {
       type: String,
-      enum: ["user", "creator", "admin"],
-      default: "user",
+      enum: ["CREATOR", "ORGANIZER"],
+      default: "CREATOR",
     }
   },
   { timestamps: true }
 );
 
-// Encrypt password before saving
+
+// 🔐 Encrypt password
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 
@@ -42,7 +44,8 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-// Compare Password
+
+// 🔍 Password Check
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

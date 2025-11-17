@@ -2,7 +2,7 @@ import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
-// Generate JWT Token Helper
+// Generate JWT Token
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "30d",
@@ -10,7 +10,7 @@ const generateToken = (id) => {
 };
 
 // ========================
-//    USER SIGN UP
+//        USER SIGN UP
 // ========================
 export const registerUser = async (req, res) => {
   try {
@@ -22,11 +22,14 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ message: "Email already registered" });
     }
 
-    // Create new user
+    // Hash password (IMPORTANT FIX)
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create user
     const user = await User.create({
       name,
       email,
-      password,
+      password: hashedPassword,
       role: role || "user",
     });
 
@@ -46,7 +49,7 @@ export const registerUser = async (req, res) => {
 };
 
 // ========================
-//    USER LOGIN
+//        USER LOGIN
 // ========================
 export const loginUser = async (req, res) => {
   try {
@@ -58,7 +61,7 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    // Match password
+    // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid email or password" });
